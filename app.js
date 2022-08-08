@@ -5,7 +5,7 @@ const { connectToDb, getDb } = require("./db");
 const app = express();
 
 //db connection
-let db
+let db;
 connectToDb(err => {
   if (!err) {
     app.listen(3000, () => {
@@ -17,5 +17,18 @@ connectToDb(err => {
 
 // Routes
 app.get("/books", (req, res) => {
-  res.json({ msg: "welcome to books api" });
+  let books = [];
+
+  db.collection("books")
+    .find()
+    .sort({ author: 1 })
+    .forEach(book => {
+      books.push(book);
+    })
+    .then(() => {
+      res.status(200).json(books);
+    })
+    .catch(() => {
+      res.status(500).json({ error: "Couldn't find books." });
+    });
 });
