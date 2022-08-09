@@ -66,3 +66,38 @@ app.post("/books", (req, res) => {
       res.status(500).json({ error: "Could not create a new document" })
     );
 });
+
+//DELETE
+app.delete("/books/:id", (req, res) => {
+  if (ObjectId.isValid(req.params.id)) {
+    db.collection("books")
+      .deleteOne({ _id: ObjectId(req.params.id) })
+      .then(result => {
+        res.status(200).json(result);
+      })
+      .catch(() => {
+        res.status(500).json({ error: "Couldn't delete the book." });
+      });
+  } else {
+    res.status(500).json({ error: "Not a valid book id." });
+  }
+});
+
+//PATCH Request
+
+app.patch("/books/:id", (req, res) => {
+  const updates = req.body;
+
+  if (ObjectId.isValid(req.params.id)) {
+    db.collection("books")
+      .updateOne({ _id: ObjectId(req.params.id) }, { $set: updates })
+      .then(result => {
+        res.status(200).json(result);
+      })
+      .catch(() => {
+        res.status(500).json({ error: "Couldn't update the book." });
+      });
+  } else {
+    res.status(500).json({ error: "Not a valid book id." });
+  }
+});
