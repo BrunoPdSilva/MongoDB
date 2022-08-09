@@ -22,11 +22,18 @@ connectToDb(err => {
 
 // Buscar todos os livros
 app.get("/books", (req, res) => {
+  //current page
+
+  const page = req.query.p || 0;
+  const booksPerPage = 3
+
   let books = [];
 
   db.collection("books")
     .find()
     .sort({ author: 1 })
+    .skip(page * booksPerPage)
+    .limit(booksPerPage)
     .forEach(book => {
       books.push(book);
     })
