@@ -1,4 +1,6 @@
 const express = require("express");
+const { ObjectId } = require("mongodb");
+
 const { connectToDb, getDb } = require("./db");
 
 // Initialize App & Middleware
@@ -16,6 +18,8 @@ connectToDb(err => {
 });
 
 // Routes
+
+// Buscar todos os livros
 app.get("/books", (req, res) => {
   let books = [];
 
@@ -31,4 +35,21 @@ app.get("/books", (req, res) => {
     .catch(() => {
       res.status(500).json({ error: "Couldn't find books." });
     });
+});
+
+// Buscar um único livro
+app.get("/books/:id", (req, res) => {
+  // Verifica se o parâmetro passado é válido
+  if (ObjectId.isValid(req.params.id)) {
+    db.collection("books")
+      .findOne({ _id: ObjectId(req.params.id) })
+      .then(doc => {
+        res.status(200).json(doc);
+      })
+      .catch(() => {
+        res.status(500).json({ error: "Couldn't find the book." });
+      });
+  } else {
+    res.status(500).json({ error: "Not a valid book id." });
+  }
 });
